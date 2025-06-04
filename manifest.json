@@ -1,0 +1,31 @@
+{
+  "manifest_version": 3,
+  "name": "AI Tab Organizer",
+  "version": "0.1.0",
+  "description": "Organize your tabs into groups automatically or manually",
+  "permissions": [
+    "tabs",
+    "tabGroups",
+    "storage",
+    "windows"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "AI Tab Organizer"
+  },
+  "background": {
+    "service_worker": "worker-wrapper.js"
+  },
+  "options_page": "options.html",
+  "icons": {
+    "16": "images/icon16.png",
+    "48": "images/icon48.png",
+    "128": "images/icon128.png"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["js/tab-categorizer.js", "js/ml-categorizer.js"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+} 
