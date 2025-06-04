@@ -1,1 +1,478 @@
- 
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>TabOrg - Admin Dashboard (Demo)</title>
+  <link rel="stylesheet" href="css/admin.css">
+  <style>
+    .github-pages-notice {
+      background-color: #f8d7da;
+      color: #721c24;
+      padding: 15px;
+      margin: 15px 0;
+      border-radius: 4px;
+      border: 1px solid #f5c6cb;
+    }
+    .github-pages-notice h3 {
+      margin-top: 0;
+    }
+    .github-pages-notice a {
+      color: #721c24;
+      font-weight: bold;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="admin-container">
+    <header class="admin-header">
+      <h1>TabOrg Admin Dashboard</h1>
+      <div class="admin-actions">
+        <button id="refreshDataBtn" class="primary-btn">Refresh Data</button>
+        <a href="options.html" class="secondary-btn">Settings</a>
+      </div>
+    </header>
+
+    <div class="github-pages-notice">
+      <h3>GitHub Pages Demo Mode</h3>
+      <p>You are viewing a demo version of the TabOrg Admin Dashboard hosted on GitHub Pages. 
+      This is a <strong>non-functional demonstration</strong> of the UI only.</p>
+      <p>To use the full extension with all features, please install it from the Chrome Web Store or clone the 
+      <a href="https://github.com/wwzjustin/TagOrg_cursor" target="_blank">GitHub repository</a> and load it as an unpacked extension.</p>
+    </div>
+
+    <div class="admin-nav">
+      <button class="nav-btn active" data-section="labels">Labels</button>
+      <button class="nav-btn" data-section="groups">Active Groups</button>
+      <button class="nav-btn" data-section="metrics">Usage Metrics</button>
+      <button class="nav-btn" data-section="settings">System Settings</button>
+    </div>
+
+    <main class="admin-content">
+      <!-- Labels Section -->
+      <section id="labels-section" class="admin-section active">
+        <h2>All Labels</h2>
+        <p class="section-desc">View all categories and labels created by users.</p>
+        
+        <div class="filter-controls">
+          <input type="text" id="labelSearch" placeholder="Search labels...">
+          <select id="labelTypeFilter">
+            <option value="all">All Types</option>
+            <option value="predefined">Predefined</option>
+            <option value="user">User-created</option>
+            <option value="ml">ML-generated</option>
+          </select>
+        </div>
+        
+        <div class="labels-grid" id="allLabels">
+          <!-- Static demo content will be populated by demo.js -->
+        </div>
+      </section>
+
+      <!-- Active Groups Section -->
+      <section id="groups-section" class="admin-section">
+        <h2>Active Tab Groups</h2>
+        <p class="section-desc">View currently active tab groups across all windows.</p>
+        
+        <div class="filter-controls">
+          <input type="text" id="groupSearch" placeholder="Search groups...">
+          <select id="groupFilter">
+            <option value="all">All Windows</option>
+            <option value="window1">Window 1</option>
+            <option value="window2">Window 2</option>
+          </select>
+        </div>
+        
+        <div class="groups-container" id="activeGroups">
+          <!-- Static demo content will be populated by demo.js -->
+        </div>
+      </section>
+
+      <!-- Metrics Section -->
+      <section id="metrics-section" class="admin-section">
+        <h2>Usage Metrics</h2>
+        <p class="section-desc">View statistics about tab organization usage.</p>
+        
+        <div class="metrics-timeframe">
+          <button class="time-btn active" data-timeframe="week">Last Week</button>
+          <button class="time-btn" data-timeframe="month">Last Month</button>
+          <button class="time-btn" data-timeframe="all">All Time</button>
+        </div>
+        
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <h3>Total Groups Created</h3>
+            <div class="metric-value" id="totalGroups">127</div>
+            <div class="metric-chart" id="groupsChart"></div>
+          </div>
+          
+          <div class="metric-card">
+            <h3>Most Popular Categories</h3>
+            <div class="metric-list" id="popularCategories"></div>
+          </div>
+          
+          <div class="metric-card">
+            <h3>AI vs. Manual Grouping</h3>
+            <div class="metric-value">
+              <span id="aiPercentage">65%</span> / <span id="manualPercentage">35%</span>
+            </div>
+            <div class="metric-chart" id="groupingTypeChart"></div>
+          </div>
+          
+          <div class="metric-card">
+            <h3>ML Accuracy Rating</h3>
+            <div class="metric-value" id="mlAccuracy">78%</div>
+            <div class="metric-chart" id="accuracyChart"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- System Settings Section -->
+      <section id="settings-section" class="admin-section">
+        <h2>System Settings</h2>
+        <p class="section-desc">Manage global settings for the tab organizer.</p>
+        
+        <div class="settings-grid">
+          <div class="settings-card">
+            <h3>ML Settings</h3>
+            <div class="setting-row">
+              <label for="globalMLThreshold">Global ML Confidence Threshold</label>
+              <div class="slider-container">
+                <input type="range" id="globalMLThreshold" min="10" max="90" value="50">
+                <span class="slider-value" id="thresholdValue">50%</span>
+              </div>
+            </div>
+            <div class="setting-row">
+              <label for="enableGlobalML">Enable ML for all users</label>
+              <input type="checkbox" id="enableGlobalML" checked>
+            </div>
+          </div>
+          
+          <div class="settings-card">
+            <h3>Category Management</h3>
+            <div class="setting-row">
+              <label for="maxCategories">Maximum user categories</label>
+              <input type="number" id="maxCategories" value="20" min="1" max="100">
+            </div>
+            <div class="setting-row">
+              <button id="resetCategoriesBtn" class="warning-btn">Reset All User Categories</button>
+            </div>
+          </div>
+          
+          <div class="settings-card">
+            <h3>Default Groups</h3>
+            <div class="setting-row">
+              <label for="newDefaultCategory">Add default category</label>
+              <div class="input-with-button">
+                <input type="text" id="newDefaultCategory" placeholder="Category name...">
+                <button id="addDefaultCategoryBtn" class="primary-btn">Add</button>
+              </div>
+            </div>
+            <div class="default-categories-list" id="defaultCategoriesList">
+              <!-- Default categories will be populated by demo.js -->
+            </div>
+          </div>
+          
+          <div class="settings-card">
+            <h3>Data Management</h3>
+            <div class="setting-row">
+              <label for="retentionPeriod">Data retention period (days)</label>
+              <input type="number" id="retentionPeriod" value="30" min="1" max="365">
+            </div>
+            <div class="setting-row">
+              <button id="clearAllDataBtn" class="danger-btn">Clear All User Data</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <div id="adminNotification" class="admin-notification">
+      <!-- Notifications will appear here -->
+    </div>
+  </div>
+
+  <!-- Demo Scripts for GitHub Pages -->
+  <script>
+    // Demo data and functionality for GitHub Pages
+    document.addEventListener('DOMContentLoaded', function() {
+      // Demo labels data
+      const demoLabels = [
+        { name: 'Work', type: 'predefined', usage: 42, keywords: ['office', 'project', 'meeting'] },
+        { name: 'Shopping', type: 'predefined', usage: 38, keywords: ['amazon', 'ebay', 'store'] },
+        { name: 'Social', type: 'predefined', usage: 31, keywords: ['facebook', 'twitter', 'instagram'] },
+        { name: 'News', type: 'predefined', usage: 27, keywords: ['cnn', 'bbc', 'nytimes'] },
+        { name: 'Technology', type: 'user', usage: 24, keywords: ['github', 'stackoverflow', 'dev'] },
+        { name: 'Finance', type: 'user', usage: 19, keywords: ['bank', 'stocks', 'budget'] },
+        { name: 'Entertainment', type: 'ml', usage: 22, keywords: ['youtube', 'netflix', 'hulu'] },
+        { name: 'Travel', type: 'ml', usage: 15, keywords: ['hotel', 'flight', 'vacation'] }
+      ];
+      
+      // Render demo labels
+      const allLabelsContainer = document.getElementById('allLabels');
+      let labelsHTML = '';
+      
+      demoLabels.forEach(label => {
+        labelsHTML += `
+          <div class="label-card">
+            <div class="label-header">
+              <div class="label-title">${label.name}</div>
+              <div class="label-type ${label.type}">${label.type}</div>
+            </div>
+            <div class="label-stats">
+              <div>Usage: ${label.usage} times</div>
+              <div>Keywords: ${label.keywords.join(', ')}</div>
+            </div>
+          </div>
+        `;
+      });
+      
+      allLabelsContainer.innerHTML = labelsHTML;
+      
+      // Demo groups data
+      const demoGroups = [
+        { 
+          title: 'Social Media', 
+          color: 'blue', 
+          isMLGenerated: true,
+          tabs: [
+            { title: 'Facebook - Home', favIconUrl: 'https://static.xx.fbcdn.net/rsrc.php/yo/r/iRmz9lCMBD2.ico' },
+            { title: 'Twitter / Home', favIconUrl: 'https://abs.twimg.com/responsive-web/web/icon-ios.8ea219d4.png' },
+            { title: 'Instagram', favIconUrl: 'https://www.instagram.com/static/images/ico/favicon.ico/36b3ee2d91ed.ico' }
+          ]
+        },
+        { 
+          title: 'Shopping', 
+          color: 'green', 
+          isMLGenerated: false,
+          tabs: [
+            { title: 'Amazon.com: Online Shopping', favIconUrl: 'https://www.amazon.com/favicon.ico' },
+            { title: 'eBay: Electronics, Cars, Fashion', favIconUrl: 'https://www.ebay.com/favicon.ico' },
+            { title: 'Etsy - Shop for handmade', favIconUrl: 'https://www.etsy.com/favicon.ico' }
+          ]
+        }
+      ];
+      
+      // Render demo groups
+      const activeGroupsContainer = document.getElementById('activeGroups');
+      let groupsHTML = '';
+      
+      demoGroups.forEach((group, index) => {
+        const displayTitle = group.isMLGenerated ? group.title : group.title;
+        
+        groupsHTML += `
+          <div class="group-card">
+            <div class="group-header">
+              <div class="group-title">
+                <div class="color-indicator" style="background-color: ${group.color}"></div>
+                ${displayTitle}
+                ${group.isMLGenerated ? '<span class="ml-badge">ML</span>' : ''}
+              </div>
+              <div class="group-actions">
+                <button class="secondary-btn view-group">Focus</button>
+              </div>
+            </div>
+            <div>Window 1 • ${group.tabs.length} tabs</div>
+            <div class="group-tabs">
+        `;
+        
+        group.tabs.forEach(tab => {
+          groupsHTML += `
+            <div class="tab-chip" title="${tab.title}">
+              <img src="${tab.favIconUrl || 'chrome://favicon'}" alt="">
+              ${tab.title.length > 20 ? tab.title.substring(0, 20) + '...' : tab.title}
+            </div>
+          `;
+        });
+        
+        groupsHTML += `
+            </div>
+          </div>
+        `;
+      });
+      
+      activeGroupsContainer.innerHTML = groupsHTML;
+      
+      // Demo popular categories
+      const popularCategoriesEl = document.getElementById('popularCategories');
+      let categoriesHTML = '';
+      
+      demoLabels.slice(0, 5).forEach(category => {
+        categoriesHTML += `
+          <div class="metric-list-item">
+            <span class="label">${category.name}</span>
+            <span class="value">${category.usage}</span>
+          </div>
+        `;
+      });
+      
+      popularCategoriesEl.innerHTML = categoriesHTML;
+      
+      // Demo default categories
+      const defaultCategoriesList = document.getElementById('defaultCategoriesList');
+      let defaultCategoriesHTML = '';
+      
+      ['Work', 'Shopping', 'Social', 'News', 'Technology'].forEach(category => {
+        defaultCategoriesHTML += `
+          <div class="category-item">
+            <span>${category}</span>
+            <button class="remove-btn" data-category="${category}">×</button>
+          </div>
+        `;
+      });
+      
+      defaultCategoriesList.innerHTML = defaultCategoriesHTML;
+      
+      // Handle navigation
+      document.querySelectorAll('.nav-btn').forEach(button => {
+        button.addEventListener('click', function() {
+          const targetSection = this.getAttribute('data-section');
+          
+          // Update active button
+          document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+          this.classList.add('active');
+          
+          // Show the target section
+          document.querySelectorAll('.admin-section').forEach(section => {
+            section.classList.remove('active');
+            if (section.id === `${targetSection}-section`) {
+              section.classList.add('active');
+            }
+          });
+        });
+      });
+      
+      // Show notification
+      document.getElementById('refreshDataBtn').addEventListener('click', function() {
+        showNotification('Data refreshed successfully!', 'success');
+      });
+      
+      // Bind other buttons to show notifications
+      document.getElementById('resetCategoriesBtn').addEventListener('click', function() {
+        showNotification('This is a demo - no actual data will be reset', 'warning');
+      });
+      
+      document.getElementById('clearAllDataBtn').addEventListener('click', function() {
+        showNotification('This is a demo - no actual data will be cleared', 'warning');
+      });
+      
+      document.getElementById('addDefaultCategoryBtn').addEventListener('click', function() {
+        const input = document.getElementById('newDefaultCategory');
+        if (input.value.trim()) {
+          showNotification('This is a demo - categories cannot be added', 'warning');
+          input.value = '';
+        }
+      });
+      
+      // Notification function
+      function showNotification(message, type = 'default') {
+        const notification = document.getElementById('adminNotification');
+        notification.textContent = message;
+        notification.className = `admin-notification ${type}`;
+        notification.classList.add('show');
+        
+        setTimeout(function() {
+          notification.classList.remove('show');
+        }, 3000);
+      }
+      
+      // Simple charts using canvas
+      function drawSimpleCharts() {
+        // Create simple line chart for groups
+        const groupsChart = document.getElementById('groupsChart');
+        const width = groupsChart.clientWidth || 250;
+        const height = 150;
+        
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        groupsChart.appendChild(canvas);
+        
+        const ctx = canvas.getContext('2d');
+        
+        // Background
+        ctx.fillStyle = '#f9f9f9';
+        ctx.fillRect(0, 0, width, height);
+        
+        // Draw simple chart
+        ctx.strokeStyle = 'var(--primary-color)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        
+        // Sample data points
+        const dataPoints = [5, 8, 12, 16, 10, 14, 20];
+        const step = width / (dataPoints.length - 1);
+        
+        dataPoints.forEach((point, i) => {
+          const x = i * step;
+          const y = height - (point / 20) * height * 0.8;
+          
+          if (i === 0) {
+            ctx.moveTo(x, y);
+          } else {
+            ctx.lineTo(x, y);
+          }
+        });
+        
+        ctx.stroke();
+        
+        // Pie chart for AI vs Manual
+        const pieChart = document.getElementById('groupingTypeChart');
+        const pieCanvas = document.createElement('canvas');
+        pieCanvas.width = width;
+        pieCanvas.height = height;
+        pieChart.appendChild(pieCanvas);
+        
+        const pieCtx = pieCanvas.getContext('2d');
+        
+        // Draw pie chart
+        const centerX = width / 2;
+        const centerY = height / 2;
+        const radius = Math.min(centerX, centerY) - 10;
+        
+        // AI Portion (65%)
+        pieCtx.fillStyle = 'var(--ml-color)';
+        pieCtx.beginPath();
+        pieCtx.moveTo(centerX, centerY);
+        pieCtx.arc(centerX, centerY, radius, 0, Math.PI * 2 * 0.65);
+        pieCtx.closePath();
+        pieCtx.fill();
+        
+        // Manual Portion (35%)
+        pieCtx.fillStyle = 'var(--chart-color-2, #2196F3)';
+        pieCtx.beginPath();
+        pieCtx.moveTo(centerX, centerY);
+        pieCtx.arc(centerX, centerY, radius, Math.PI * 2 * 0.65, Math.PI * 2);
+        pieCtx.closePath();
+        pieCtx.fill();
+        
+        // Bar chart for accuracy
+        const accuracyChart = document.getElementById('accuracyChart');
+        const barCanvas = document.createElement('canvas');
+        barCanvas.width = width;
+        barCanvas.height = height;
+        accuracyChart.appendChild(barCanvas);
+        
+        const barCtx = barCanvas.getContext('2d');
+        
+        // Draw bar chart
+        const barWidth = width - 40;
+        const barHeight = 20;
+        const x = 20;
+        const y = height / 2 - barHeight / 2;
+        
+        // Background bar
+        barCtx.fillStyle = '#eee';
+        barCtx.fillRect(x, y, barWidth, barHeight);
+        
+        // Accuracy bar (78%)
+        barCtx.fillStyle = 'var(--primary-color)';
+        barCtx.fillRect(x, y, (78 / 100) * barWidth, barHeight);
+      }
+      
+      // Draw charts after a short delay to ensure DOM is ready
+      setTimeout(drawSimpleCharts, 100);
+    });
+  </script>
+</body>
+</html> 
